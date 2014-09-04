@@ -1,3 +1,5 @@
+'use strict';
+
 function Grades() {
   this.content = [];
 }
@@ -5,7 +7,7 @@ function Grades() {
 Grades.prototype.addGrade = function(grade) {
   this.content.push(grade);
   console.log('added ' + grade + ' to grades');
-}
+};
 
 Grades.prototype.getAverage = function() {
   if (this.content.length === 0) return null;
