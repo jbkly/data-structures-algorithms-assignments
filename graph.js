@@ -26,6 +26,7 @@ var Graph = function(v) {
   for (var i = 0; i < this.vertices; i++) {
     this.marked[i] = false;
   }
+  this.edgeTo = [];
 }
 
 Graph.prototype.addEdge = function(v, w) {
@@ -62,15 +63,16 @@ Graph.prototype.depthFirstSearch = function(v) {
 Graph.prototype.breadthFirstSearch = function(s) {
   var queue = [];
   this.marked[s] = true;
-  queue.push(s);
+  queue.push(s); // add to back of queue
   while (queue.length > 0) {
-    var v = queue.shift();
+    var v = queue.shift(); // remove from front of queue
     if (v !== undefined) {
       console.log('Visited vertex: ' + v);
     }
     for (var i = 0; i < this.adj[v].length; i++) {
       var w = this.adj[v][i];
       if (!this.marked[w]) {
+        this.edgeTo[w] = v;
         this.marked[w] = true;
         queue.push(w);
       }
@@ -78,14 +80,63 @@ Graph.prototype.breadthFirstSearch = function(s) {
   }
 }
 
+Graph.prototype.pathTo = function(source, v) {
+  if (!this.hasPathTo(v)) {
+    return undefined;
+  }
+  var path = [];
+  for (var i = v; i != source; i = this.edgeTo[i]) {
+    path.push(i);
+  }
+  path.push(source);
+  return path;
+}
+
+Graph.prototype.hasPathTo = function(v) {
+  return this.marked[v];
+}
+
+Graph.prototype.showPath = function(paths) {
+  while (paths.length > 0) {
+    if (paths.length > 1) {
+      process.stdout.write(paths.pop() + '-');
+    } else {
+      process.stdout.write(paths.pop());
+    }
+  }
+}
+
 module.exports = Graph;
 
-// // tests
-// g = new Graph(5);
-// g.addEdge(0,1);
-// g.addEdge(0,2);
-// g.addEdge(1,3);
-// g.addEdge(2,4);
+// tests
+// function getRandomInt(min, max) {
+//   return Math.floor(Math.random() * (max - min)) + min;
+// }
+// var randomNum = getRandomInt(1, 1000);
+
+// console.log('Creating a graph with ' + randomNum + ' vertices...');
+// g = new Graph(randomNum);
+
+// console.log('Add some edges to the graph...');
+// for (var i = 0; i < randomNum - 1; i++) {
+//   var randomNum2 = getRandomInt(0, randomNum);
+//   var randomNum3 = getRandomInt(0, randomNum);
+//   g.addEdge(randomNum2, randomNum3);
+// };
+
+g = new Graph(5);
+g.addEdge(0,1);
+g.addEdge(0,2);
+g.addEdge(1,3);
+g.addEdge(2,4);
 // g.showGraph();
-// // g.depthFirstSearch(0);
-// g.breadthFirstSearch(0);
+
+// console.log('depth-first search: ');
+// g.depthFirstSearch(0);
+console.log('breadth-first search: ');
+g.breadthFirstSearch(0);
+
+var vertex = 4;
+var source = 0;
+var paths = g.pathTo(source, vertex);
+g.showPath(paths);
